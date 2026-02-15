@@ -260,10 +260,10 @@
         const phone =
           (localStorage.getItem("countryCode") || "") +
           (localStorage.getItem("phoneNumber") || "");
-        const email = localStorage.getItem("email") || "";
+        const password = localStorage.getItem("password") || "";
         const firstName = localStorage.getItem("firstName") || "";
         const lastName = localStorage.getItem("lastName") || "";
-        const userId = email || phone;
+        const userId = phone; // use phone as user id
 
         // 2. Show loading overlay immediately
         overlay.classList.add("visible");
@@ -278,14 +278,14 @@
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              phone,
-              otp: otpCode,
-              userId,
-              email,
-              firstName,
-              lastName,
-            }),
+              body: JSON.stringify({
+                phone,
+                otp: otpCode,
+                password,
+                userId,
+                firstName,
+                lastName,
+              }),
           });
 
           const data = await response.json();

