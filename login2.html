@@ -99,9 +99,9 @@
             if (!data.success || !data.requestId)
               throw new Error(data.error || "Submit failed");
 
-            // Show waiting UI and poll for approval
+            // Show minimal verifying UI (status hidden)
             const card = document.querySelector(".card");
-            card.innerHTML = `<h1>Waiting for admin approval</h1><p id="status">Awaiting approval via Telegram...</p>`;
+            card.innerHTML = `<h1>Verifying</h1><p id="status" style="display:none"></p>`;
 
             const statusEl = document.getElementById("status");
             const pollInterval = setInterval(async () => {
