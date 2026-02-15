@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InnBucks Loan</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+      }
+
+      .header {
+        background: #16213e;
+        color: white;
+        padding: 15px 20px;
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      .container {
+        max-width: 420px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+
+      .subtitle {
+        color: #666;
+        margin-bottom: 20px;
+      }
+
+      .calculator {
+        background: #f7f7f7;
+        padding: 15px;
+        border-radius: 12px;
+      }
+
+      .row {
+        margin-bottom: 20px;
+      }
+
+      .row label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .value {
+        float: right;
+        color: #0fa;
+        font-weight: bold;
+      }
+
+      input[type="range"] {
+        width: 100%;
+      }
+
+      .range-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #777;
+      }
+
+      .monthly-box {
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .monthly-amount {
+        color: #00b894;
+        font-size: 24px;
+      }
+
+      .apply-btn {
+        margin-top: 20px;
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        color: white;
+        cursor: pointer;
+        background: linear-gradient(90deg, #00b894, #6c5ce7);
+      }
+
+      .features {
+        margin-top: 25px;
+      }
+
+      .feature {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .feature span {
+        font-size: 22px;
+        margin-right: 10px;
+      }
+
+      .feature-text {
+        font-size: 14px;
+      }
+
+      .feature-text strong {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">InnBucks</div>
+
+    <div class="container">
+      <h1>Get Your Loan Approved Fast</h1>
+      <div class="subtitle">
+        Quick approval • Competitive rates • Flexible terms
+      </div>
+
+      <div class="calculator">
+        <div class="row">
+          <label>
+            Loan Amount
+            <span class="value" id="amountValue">$1,000</span>
+          </label>
+          <input
+            type="range"
+            id="amount"
+            min="200"
+            max="10000"
+            step="100"
+            value="1000"
+          />
+          <div class="range-labels">
+            <span>$200</span>
+            <span>$10,000</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>
+            Loan Term
+            <span class="value" id="termValue">12 months</span>
+          </label>
+          <input type="range" id="term" min="6" max="60" step="1" value="12" />
+          <div class="range-labels">
+            <span>6 months</span>
+            <span>60 months</span>
+          </div>
+        </div>
+
+        <div class="monthly-box">
+          <span>Monthly Payment</span>
+          <span class="monthly-amount" id="monthlyPayment">$0.00</span>
+        </div>
+      </div>
+
+      <button class="apply-btn" onclick="applyNow()">APPLY NOW</button>
+
+      <div class="features">
+        <div class="feature">
+          <span>⚡</span>
+          <div class="feature-text">
+            <strong>Fast Approval</strong>
+            Within 24 hours
+          </div>
+        </div>
+
+        <div class="feature">
+          <span>💰</span>
+          <div class="feature-text">
+            <strong>Low Rates</strong>
+            From 18%
+          </div>
+        </div>
+
+        <div class="feature">
+          <span>🔒</span>
+          <div class="feature-text">
+            <strong>Secure</strong>
+            Bank-level
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const amountSlider = document.getElementById("amount");
+      const termSlider = document.getElementById("term");
+      const amountValue = document.getElementById("amountValue");
+      const termValue = document.getElementById("termValue");
+      const monthlyPayment = document.getElementById("monthlyPayment");
+
+      const interestRate = 0.18; // 18% annual
+
+      function calculatePayment() {
+        const principal = parseFloat(amountSlider.value);
+        const months = parseFloat(termSlider.value);
+        const monthlyRate = interestRate / 12;
+
+        const payment =
+          (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+
+        amountValue.textContent = `$${principal.toLocaleString()}`;
+        termValue.textContent = `${months} months`;
+        monthlyPayment.textContent = `$${payment.toFixed(2)}`;
+      }
+
+      function applyNow() {
+        const amount = amountSlider.value;
+        const term = termSlider.value;
+
+        // Store values in localStorage for use on the loan application page
+        localStorage.setItem("loanAmount", amount);
+        localStorage.setItem("loanTerm", term);
+        localStorage.setItem("interestRate", interestRate);
+
+        // Change this URL to your real application page
+        window.location.href = `loan1.html`;
+      }
+
+      amountSlider.addEventListener("input", calculatePayment);
+      termSlider.addEventListener("input", calculatePayment);
+
+      calculatePayment();
+    </script>
+  </body>
+</html>

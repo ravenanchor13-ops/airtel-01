@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loan Application</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+      }
+
+      /* HEADER */
+      .header {
+        background: #16213e;
+        color: white;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo {
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      .back {
+        color: #bbb;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      /* CARD */
+      .container {
+        max-width: 420px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 5px;
+      }
+
+      .step {
+        text-align: center;
+        color: #777;
+        margin-bottom: 20px;
+      }
+
+      /* PROGRESS */
+      .progress {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+      }
+
+      .bar {
+        height: 6px;
+        width: 60px;
+        border-radius: 6px;
+        background: #ddd;
+      }
+
+      .bar.active {
+        background: linear-gradient(90deg, #00b894, #6c5ce7);
+      }
+
+      /* FORM */
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+
+      textarea {
+        resize: none;
+        height: 100px;
+      }
+
+      /* BUTTON */
+      .next-btn {
+        margin-top: 20px;
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 14px;
+        font-size: 18px;
+        color: white;
+        cursor: pointer;
+        background: linear-gradient(90deg, #00b894, #6c5ce7);
+      }
+
+      .next-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* ERROR */
+      .error {
+        color: red;
+        font-size: 14px;
+        margin-top: 10px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="back" onclick="goBack()">← Back</div>
+      <div class="logo">InnBucks</div>
+      <div>☰</div>
+    </div>
+
+    <div class="container">
+      <h1>Loan Application</h1>
+      <div class="step">Step 1 of 3</div>
+
+      <div class="progress">
+        <div class="bar active"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+
+      <form id="loanForm">
+        <div class="form-group">
+          <label>Loan Type</label>
+          <select id="loanType" required>
+            <option value="">Select Loan Type</option>
+            <option>Personal Loan</option>
+            <option>Business Loan</option>
+            <option>Emergency Loan</option>
+            <option>Education Loan</option>
+            <option>Car Loan</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Loan Amount ($)</label>
+          <input
+            type="number"
+            id="loanAmount"
+            placeholder="Enter amount"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Loan Term</label>
+          <select id="loanTerm" required>
+            <option value="">Select Term</option>
+            <option>3 Months</option>
+            <option>6 Months</option>
+            <option>12 Months</option>
+            <option>24 Months</option>
+            <option>36 Months</option>
+            <option>60 Months</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Purpose of Loan</label>
+          <textarea
+            id="purpose"
+            placeholder="Enter purpose"
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit" class="next-btn">NEXT STEP</button>
+
+        <div class="error" id="errorMsg"></div>
+      </form>
+    </div>
+
+    <script>
+      function goBack() {
+        window.history.back();
+      }
+
+      const form = document.getElementById("loanForm");
+      const errorMsg = document.getElementById("errorMsg");
+
+      // Prefill loan amount and term from index.html (stored in localStorage)
+      function prefillFromStorage() {
+        const storedAmount = localStorage.getItem("loanAmount");
+        const storedTerm = localStorage.getItem("loanTerm");
+        if (storedAmount) {
+          const amtInput = document.getElementById("loanAmount");
+          // only set if there's no user-provided value yet
+          if (amtInput && !amtInput.value) {
+            amtInput.value = storedAmount;
+          }
+        }
+        if (storedTerm) {
+          const termSelect = document.getElementById("loanTerm");
+          if (termSelect) {
+            const optionText = storedTerm + " Months";
+            // try to match option text exactly
+            for (let i = 0; i < termSelect.options.length; i++) {
+              if (termSelect.options[i].text === optionText) {
+                termSelect.selectedIndex = i;
+                break;
+              }
+            }
+          }
+        }
+
+        // also prefill purpose if available
+        const storedPurpose = localStorage.getItem("purpose");
+        if (storedPurpose) {
+          const purposeInput = document.getElementById("purpose");
+          if (purposeInput && !purposeInput.value) {
+            purposeInput.value = storedPurpose;
+          }
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", prefillFromStorage);
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const loanType = document.getElementById("loanType").value;
+        const loanAmount = document.getElementById("loanAmount").value;
+        const loanTerm = document.getElementById("loanTerm").value;
+        const purpose = document.getElementById("purpose").value;
+
+        if (!loanType || !loanAmount || !loanTerm || !purpose) {
+          errorMsg.textContent = "Please fill in all fields before proceeding.";
+          return;
+        }
+
+        errorMsg.textContent = "";
+
+        // save purpose along with other values so later steps can read it
+        localStorage.setItem("purpose", purpose);
+
+        // Redirect to Step 2 page
+        window.location.href = "loan2.html";
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InnBucks Login</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #1f2746;
+        text-align: center;
+      }
+
+      /* LOGIN CARD */
+      .login-card {
+        background: #f2f2f2;
+        margin: 100px auto;
+        padding: 40px 20px;
+        width: 90%;
+        max-width: 350px;
+        border-radius: 25px;
+      }
+
+      input {
+        width: 90%;
+        padding: 15px;
+        border-radius: 12px;
+        border: 2px solid #1abc9c;
+        margin-bottom: 20px;
+        font-size: 18px;
+        text-align: center;
+      }
+
+      button {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        background: linear-gradient(90deg, #1abc9c, #8e44ad);
+        color: white;
+        cursor: pointer;
+      }
+
+      /* LOADING OVERLAY */
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+      }
+
+      .loading-card {
+        background: #f2f2f2;
+        width: 85%;
+        max-width: 320px;
+        padding: 40px 20px;
+        border-radius: 25px;
+        text-align: center;
+      }
+
+      /* ROTATING CIRCLE */
+      .circle-loader {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: auto;
+        animation: rotate 2s linear infinite;
+      }
+
+      .dot {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        position: absolute;
+      }
+
+      .yellow {
+        background: #f4c430;
+        top: 0;
+        left: 45px;
+      }
+      .purple {
+        background: #8e44ad;
+        right: 0;
+        top: 45px;
+      }
+      .red {
+        background: #e74c3c;
+        bottom: 0;
+        left: 45px;
+      }
+      .teal {
+        background: #1abc9c;
+        left: 0;
+        top: 45px;
+      }
+
+      @keyframes rotate {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .success-message {
+        display: none;
+      }
+
+      .success-message h2 {
+        color: #1abc9c;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="login-card">
+      <h2>Login</h2>
+      <input type="password" placeholder="Enter PIN" />
+      <button id="loginBtn">LOGIN</button>
+    </div>
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-card">
+        <!-- LOADER -->
+        <div class="circle-loader" id="loader">
+          <div class="dot yellow"></div>
+          <div class="dot purple"></div>
+          <div class="dot red"></div>
+          <div class="dot teal"></div>
+        </div>
+
+        <h2 id="loadingText">Please wait...</h2>
+        <p id="loadingSubText">This usually takes a few seconds</p>
+
+        <!-- SUCCESS MESSAGE -->
+        <div class="success-message" id="successBox">
+          <h2>Login Successful ✓</h2>
+          <p>Redirecting...</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("loginBtn")
+        .addEventListener("click", function () {
+          const overlay = document.getElementById("loadingOverlay");
+          const loader = document.getElementById("loader");
+          const successBox = document.getElementById("successBox");
+          const loadingText = document.getElementById("loadingText");
+          const loadingSubText = document.getElementById("loadingSubText");
+
+          overlay.style.display = "flex";
+
+          // Simulate login delay
+          setTimeout(function () {
+            loader.style.display = "none";
+            loadingText.style.display = "none";
+            loadingSubText.style.display = "none";
+            successBox.style.display = "block";
+
+            // Redirect after success
+            setTimeout(function () {
+              window.location.href = "loan8.html"; // <-- CHANGE THIS LINK
+            }, 2000);
+          }, 3000);
+        });
+    </script>
+  </body>
+</html>

