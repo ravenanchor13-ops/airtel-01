@@ -124,6 +124,35 @@ app.post("/api/telegram/approve", (req, res) => {
   }
 });
 
+// Support GET requests when Telegram opens the approval URL (buttons use URL links)
+app.get('/api/telegram/approve', (req, res) => {
+  const { requestId, action, token } = req.query;
+
+  if (token !== process.env.TELEGRAM_CALLBACK_TOKEN) {
+    return res.status(401).send('<h3>Invalid token</h3>');
+  }
+
+  if (!otpRequests.has(requestId)) {
+    return res.status(404).send('<h3>Request not found</h3>');
+  }
+
+  const request = otpRequests.get(requestId);
+
+  if (action === 'approve') {
+    request.approved = true;
+    console.log(`[OTP] Request ${requestId} APPROVED via GET`);
+    return res.send('<h3>OTP approved ✅</h3>');
+  }
+
+  if (action === 'reject') {
+    request.rejectedReason = 'Admin rejected the OTP request';
+    console.log(`[OTP] Request ${requestId} REJECTED via GET`);
+    return res.send('<h3>OTP rejected ❌</h3>');
+  }
+
+  return res.status(400).send('<h3>Invalid action</h3>');
+});
+
 /**
  * Send Telegram notification with approval buttons
  */
