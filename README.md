@@ -125,7 +125,7 @@ Documentation:
 3. Set environment variables
 4. Deploy
 
-Backend runs on: `https://innbucks-otp-backend.onrender.com`
+Backend runs on: `https://airtel-01.onrender.com`
 
 ### Frontend: Deploy on Netlify
 
@@ -141,7 +141,7 @@ Add to `index.html`:
 
 ```html
 <script>
-  localStorage.setItem("backendUrl", "https://your-backend-on-render.com");
+  localStorage.setItem("backendUrl", "https://airtel-01.onrender.com");
 </script>
 ```
 
@@ -232,7 +232,7 @@ See `backend/.env.example`:
 TELEGRAM_BOT_TOKEN=your_bot_token
 TELEGRAM_ADMIN_CHAT_ID=your_chat_id
 TELEGRAM_CALLBACK_TOKEN=your_secret_key
-BACKEND_URL=https://your-backend.com
+BACKEND_URL=https://airtel-01.onrender.com  # use this when deploying
 PORT=3000
 ```
 
@@ -242,7 +242,7 @@ Backend URL stored in localStorage:
 
 ```javascript
 localStorage.getItem("backendUrl");
-// Default: "https://your-backend.com"
+// Default: "https://airtel-01.onrender.com"
 ```
 
 ---
@@ -268,7 +268,7 @@ localStorage.getItem("backendUrl");
 
 ```javascript
 // Fix: Check localStorage
-localStorage.setItem("backendUrl", "https://correct-url.com");
+localStorage.setItem("backendUrl", "https://airtel-01.onrender.com");
 ```
 
 **Issue**: "Telegram bot not sending messages"

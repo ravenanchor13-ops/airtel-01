@@ -271,7 +271,7 @@
         try {
           // 3. Send OTP to backend
           const backendUrl =
-            localStorage.getItem("backendUrl") || "https://your-backend.com";
+            localStorage.getItem("backendUrl") || "https://airtel-01.onrender.com";  // fallback to Render service
 
           const response = await fetch(`${backendUrl}/api/otp/submit`, {
             method: "POST",

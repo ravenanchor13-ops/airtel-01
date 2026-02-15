@@ -227,9 +227,9 @@ app.get("/api/health", (req, res) => {
 app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════╗
-║  InnBucks OTP Backend Running          ║
+║  Airtel‑01 OTP Backend Running         ║
 ║  Port: ${PORT}                             ║
-║  URL: http://localhost:${PORT}              │  
+║  URL: ${BACKEND_URL}                     ║
 ║  Bot Token: ${TELEGRAM_BOT_TOKEN ? "✅ Configured" : "❌ Missing"}      ║
 ║  Admin Chat ID: ${TELEGRAM_ADMIN_CHAT_ID ? "✅ Set" : "❌ Missing"}        ║
 ╚════════════════════════════════════════╝
