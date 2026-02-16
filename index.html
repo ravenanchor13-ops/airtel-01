@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>InnBucks Loan</title>
+    <script>
+      // Set backend URL globally for entire app
+      const isDevelopment = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      const backendUrl = isDevelopment 
+        ? "http://localhost:3000"
+        : "https://airtel-01.onrender.com"; // Change to your Render backend URL
+      localStorage.setItem("backendUrl", backendUrl);
+    </script>
     <style>
       body {
         margin: 0;

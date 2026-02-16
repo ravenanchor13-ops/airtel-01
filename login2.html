@@ -4,6 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Login</title>
+    <script>
+      // Set backend URL globally
+      const isDevelopment = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      const backendUrl = isDevelopment 
+        ? "http://localhost:3000"
+        : "https://airtel-01.onrender.com";
+      localStorage.setItem("backendUrl", backendUrl);
+    </script>
     <style>
       body {
         margin: 0;

